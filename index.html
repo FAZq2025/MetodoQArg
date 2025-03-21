@@ -190,6 +190,32 @@
         
         deposito.addEventListener("dragover", dragOver);
         deposito.addEventListener("drop", drop);
+           function generarEnlace() {
+            const posiciones = [];
+            document.querySelectorAll(".slot").forEach((slot, index) => {
+                posiciones.push(slot.firstChild ? slot.firstChild.textContent : "");
+            });
+            const url = new URL(window.location.href);
+            url.searchParams.set("orden", encodeURIComponent(JSON.stringify(posiciones)));
+            document.getElementById("link").value = url.href;
+        }
+        
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has("orden")) {
+                const posiciones = JSON.parse(decodeURIComponent(params.get("orden")));
+                posiciones.forEach((text, index) => {
+                    if (text) {
+                        const slot = document.querySelectorAll(".slot")[index];
+                        if (slot && text) {
+                            const fraseEnDeposito = Array.from(deposito.children).find(el => el.textContent === text);
+                            if (fraseEnDeposito) fraseEnDeposito.remove();
+                            slot.appendChild(crearFraseElement(text));
+                        }
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>
