@@ -19,6 +19,16 @@
             flex-direction: column;
             align-items: center;
             gap: 5px;
+            position: relative;
+        }
+        .deposito .phrase {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 5px; /* Espacio entre las cartas */
+            transition: all 0.2s ease;
+            z-index: 1;
         }
         .grid {
             display: flex;
@@ -123,7 +133,12 @@
             return div;
         }
         
-        frases.forEach(frase => deposito.appendChild(crearFraseElement(frase)));
+        // Insertar las frases en el orden preestablecido en el deposito
+        frases.forEach((frase, index) => {
+            const fraseElement = crearFraseElement(frase);
+            fraseElement.style.top = `${index * 0}px`; // Acomodar las frases como un mazo
+            deposito.appendChild(fraseElement);
+        });
         
         estructura.forEach((nombre, index) => {
             const column = document.createElement("div");
@@ -201,4 +216,5 @@
     </script>
 </body>
 </html>
+
 
