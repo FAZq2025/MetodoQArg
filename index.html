@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,8 +15,8 @@
         }
         .deposito {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(4, 1fr);
+            grid-template-columns: repeat(8, 1fr); /* 8 columnas */
+            grid-template-rows: repeat(4, 1fr); /* 4 filas */
             gap: 10px;
             width: 80%;
             min-height: 150px;
@@ -23,36 +25,24 @@
             margin-top: -10px;
             justify-content: center;
         }
-        .workspace {
-            width: 40cm;
-            height: 20cm;
-            border: 2px solid black;
-            background-color: #f0f0f0;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            margin: 20px 0;
-            position: relative;
-        }
-        .phrase {
+        .deposito .phrase {
             padding: 10px;
             background-color: lightblue;
             cursor: grab;
             user-select: none;
             border: 1px solid #000;
             text-align: center;
-            width: auto;
-            min-width: 100px;
+            width: 100%; /* Ajusta el tamaño dentro del grid */
+            height: auto;
             min-height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             word-wrap: break-word;
-            position: absolute;
         }
         .grid {
             display: flex;
+            gap: -5px;
             margin-top: -1px;
         }
         .column {
@@ -77,15 +67,12 @@
 <body>
     <div class="container">
         <h2>Frases a ordenar</h2>
-        <div class="deposito" id="deposito"></div>
-
-        <h2>Espacio de Trabajo</h2>
-        <div class="workspace" id="workspace"></div>
-
+        <div class="deposito" id="deposito"></div> <!-- Cuadrícula 8x4 para las frases -->
         <h2>Grilla de Ordenación</h2>
-        <div class="grid" id="grid"></div>
+        <div class="grid" id="grid"></div> <!-- Cuadrícula de ordenación original -->
+        <button onclick="generarEnlace()">Generar Enlace al finalizar la clasificación de todas las frases, luego copiar y enviar link a zanczuk@iicar-conicet.gob.ar</button>
+        <input type="text" id="link" readonly style="width: 80%; margin-top: 10px;">
     </div>
-
     
     <script>
         const frases = [
@@ -128,76 +115,96 @@
         
         const deposito = document.getElementById("deposito");
         const grid = document.getElementById("grid");
-        const deposito = document.getElementById("deposito");
-        const workspace = document.getElementById("workspace");
-        const grid = document.getElementById("grid");
-
+        
+        // Crear los elementos de frase para el deposito
         function crearFraseElement(text) {
             const div = document.createElement("div");
             div.classList.add("phrase");
             div.draggable = true;
             div.textContent = text;
-            div.style.left = "0px";
-            div.style.top = "0px";
-
             div.addEventListener("dragstart", dragStart);
             div.addEventListener("dragend", dragEnd);
-            div.addEventListener("mousedown", mouseDown);
-            
             return div;
         }
 
+        // Rellenar la cuadrícula de frases
         frases.forEach(frase => {
             deposito.appendChild(crearFraseElement(frase));
         });
-
+        
+        // Crear la grilla para ordenación
+        estructura.forEach((nombre, index) => {
+            const column = document.createElement("div");
+            column.classList.add("column");
+            
+            const label = document.createElement("h3");
+            label.textContent = nombre;
+            column.appendChild(label);
+            
+            for (let i = 0; i < espacios[index]; i++) {
+                const slot = document.createElement("div");
+                slot.classList.add("slot");
+                slot.addEventListener("dragover", dragOver);
+                slot.addEventListener("drop", drop);
+                column.appendChild(slot);
+            }
+            grid.appendChild(column);
+        });
+        
+        // Drag and drop
         function dragStart(event) {
             event.dataTransfer.setData("text", event.target.textContent);
             event.target.classList.add("dragging");
+            setTimeout(() => event.target.style.visibility = "hidden", 0);
         }
-
+        
         function dragEnd(event) {
             event.target.classList.remove("dragging");
+            event.target.style.visibility = "visible";
         }
-
-        function mouseDown(event) {
-            const element = event.target;
-            let shiftX = event.clientX - element.getBoundingClientRect().left;
-            let shiftY = event.clientY - element.getBoundingClientRect().top;
-
-            function moveAt(pageX, pageY) {
-                element.style.left = pageX - shiftX + "px";
-                element.style.top = pageY - shiftY + "px";
-            }
-
-            function onMouseMove(event) {
-                moveAt(event.pageX, event.pageY);
-            }
-
-            document.addEventListener("mousemove", onMouseMove);
-
-            element.onmouseup = function() {
-                document.removeEventListener("mousemove", onMouseMove);
-                element.onmouseup = null;
-            };
-        }
-
+        
         function dragOver(event) {
             event.preventDefault();
         }
-
+        
         function drop(event) {
             event.preventDefault();
             const text = event.dataTransfer.getData("text");
             const draggedElement = document.querySelector(".dragging");
-
+            
             if (event.target.classList.contains("slot") && !event.target.firstChild) {
                 event.target.appendChild(draggedElement);
             }
         }
 
-        workspace.addEventListener("dragover", dragOver);
-        workspace.addEventListener("drop", drop);
+        // Generar enlace con el orden
+        function generarEnlace() {
+            const posiciones = [];
+            document.querySelectorAll(".slot").forEach((slot, index) => {
+                posiciones.push(slot.firstChild ? slot.firstChild.textContent : "");
+            });
+            const url = new URL(window.location.href);
+            url.searchParams.set("orden", encodeURIComponent(JSON.stringify(posiciones)));
+            document.getElementById("link").value = url.href;
+        }
+
+        // Cargar el enlace de la URL
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has("orden")) {
+                const posiciones = JSON.parse(decodeURIComponent(params.get("orden")));
+                posiciones.forEach((text, index) => {
+                    if (text) {
+                        const slot = document.querySelectorAll(".slot")[index];
+                        if (slot && text) {
+                            const fraseEnDeposito = Array.from(deposito.children).find(el => el.textContent === text);
+                            if (fraseEnDeposito) fraseEnDeposito.remove();
+                            slot.appendChild(crearFraseElement(text));
+                        }
+                    }
+                });
+            }
+        };
     </script>
 </body>
 </html>
