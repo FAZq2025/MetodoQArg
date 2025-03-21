@@ -184,8 +184,17 @@
             if (draggedElement) {
                 if (event.target === deposito) {
                     deposito.appendChild(draggedElement);
-                } else if (event.target.classList.contains("slot") && !event.target.firstChild) {
+                } else if (event.target.classList.contains("slot")) {
+                if (!event.target.firstChild) {
                     event.target.appendChild(draggedElement);
+                }
+            } else if (event.target === deposito) {
+                deposito.appendChild(draggedElement);
+            }
+        }
+        
+        deposito.addEventListener("dragover", dragOver);
+        deposito.addEventListener("drop", drop);
                 }
             }
         }
