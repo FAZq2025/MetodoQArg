@@ -21,10 +21,9 @@
       border: 2px dashed #999;
       background-color: #fff;
       margin-bottom: 20px;
-      /* Se permite visualizar si se arrastra fuera */
       overflow: visible;
     }
-    /* Caja de frase: estilo inicial (se creará con posición absoluta en el depósito) */
+    /* Caja de frase: estilo inicial */
     .phrase {
       position: absolute;
       padding: 10px;
@@ -131,7 +130,7 @@
       div.textContent = text;
       div.style.left = left + "px";
       div.style.top = top + "px";
-      // Se asocia el evento para iniciar el arrastre (free drag)
+      // Se asocia el evento para iniciar el arrastre (ya sea desde depósito o grid)
       div.addEventListener("mousedown", iniciarArrastre);
       return div;
     }
@@ -167,7 +166,7 @@
 
     function iniciarArrastre(event) {
       currentDragged = event.currentTarget;
-      // Guardar el padre original (deposito) y la posición relativa
+      // Guardar el padre original (puede ser el depósito o un slot de la grilla)
       originalParent = currentDragged.parentElement;
       originalPos.left = currentDragged.getBoundingClientRect().left;
       originalPos.top = currentDragged.getBoundingClientRect().top;
@@ -186,7 +185,6 @@
 
     function moverElemento(event) {
       if (!currentDragged) return;
-      // Actualizar posición en función del cursor y el offset
       const nuevaIzquierda = event.clientX - offsetX;
       const nuevaArriba = event.clientY - offsetY;
       currentDragged.style.left = nuevaIzquierda + "px";
@@ -202,6 +200,7 @@
       const fraseRect = currentDragged.getBoundingClientRect();
       const slots = document.querySelectorAll(".slot");
       let colocado = false;
+      
       // Detectar si la frase se solapa con algún slot vacío
       slots.forEach(slot => {
         const slotRect = slot.getBoundingClientRect();
@@ -212,8 +211,7 @@
           fraseRect.bottom > slotRect.top &&
           slot.childNodes.length === 0
         ) {
-          // Si hay colisión, reubicar la frase en el slot y remover el evento de arrastre
-          currentDragged.removeEventListener("mousedown", iniciarArrastre);
+          // Reubicar la frase en el slot (no se elimina el listener para permitir nuevos arrastres)
           currentDragged.style.position = "static";
           currentDragged.style.left = "";
           currentDragged.style.top = "";
@@ -221,9 +219,9 @@
           colocado = true;
         }
       });
-      // Si no se soltó en ningún slot, reinsertarla en el depósito.
+      
+      // Si no se soltó en ningún slot, reinsertarla en el depósito
       if (!colocado) {
-        // Calcular la posición relativa al depósito
         const depRect = deposito.getBoundingClientRect();
         const finalLeft = event.clientX - offsetX - depRect.left;
         const finalTop = event.clientY - offsetY - depRect.top;
@@ -255,10 +253,8 @@
         const slots = document.querySelectorAll(".slot");
         posiciones.forEach((texto, index) => {
           if (texto && slots[index]) {
-            // Buscar la frase en el depósito para evitar duplicados
             const existente = Array.from(deposito.children).find(el => el.textContent === texto);
             if (existente) {
-              existente.removeEventListener("mousedown", iniciarArrastre);
               existente.style.position = "static";
               existente.style.left = "";
               existente.style.top = "";
