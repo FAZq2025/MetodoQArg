@@ -33,7 +33,7 @@
         .slot {
             width: 130px;
             height: 90px;
-            border: 1px solid #ccc;
+            border: 2px solid #ccc;
             margin: 1px 0;
             display: flex;
             align-items: center;
@@ -55,7 +55,7 @@
             align-items: center;
             justify-content: center;
             word-wrap: break-word;
-	                  }
+        }
         .slot .phrase {
             width: 100%; /* Ajuste automático al ancho del slot */
         }
@@ -125,13 +125,7 @@
         }
         
         frases.forEach(frase => deposito.appendChild(crearFraseElement(frase)));
-
-            document.querySelectorAll(".phrase").forEach((frase, index) => {
-                frase.style.display = index === 0 ? "flex" : "none";
-            });
-        }
-      
-	    
+        
         estructura.forEach((nombre, index) => {
             const column = document.createElement("div");
             column.classList.add("column");
@@ -208,29 +202,3 @@
     </script>
 </body>
 </html>
-
-               
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
