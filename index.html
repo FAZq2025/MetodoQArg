@@ -136,7 +136,44 @@
             cell.addEventListener("dragend", dragEnd);
             gridFrases.appendChild(cell);
         });
-
+ const estructura = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
+        const espacios = [2, 3, 4, 4, 6, 4, 4, 3, 2];
+        
+        const deposito = document.getElementById("deposito");
+        const grid = document.getElementById("grid");
+        
+        function crearFraseElement(text) {
+            const div = document.createElement("div");
+            div.classList.add("phrase");
+            div.draggable = true;
+            div.textContent = text;
+            div.addEventListener("dragstart", dragStart);
+            div.addEventListener("dragend", dragEnd);
+            return div;
+        }
+        
+        frases.forEach(frase => {
+            deposito.appendChild(crearFraseElement(frase));
+        });
+        
+        estructura.forEach((nombre, index) => {
+            const column = document.createElement("div");
+            column.classList.add("column");
+            
+            const label = document.createElement("h3");
+            label.textContent = nombre;
+            column.appendChild(label);
+            
+            for (let i = 0; i < espacios[index]; i++) {
+                const slot = document.createElement("div");
+                slot.classList.add("slot");
+                slot.addEventListener("dragover", dragOver);
+                slot.addEventListener("drop", drop);
+                column.appendChild(slot);
+            }
+            grid.appendChild(column);
+        });
+        
         // Funciones para arrastrar las frases
         function dragStart(event) {
             event.dataTransfer.setData("text", event.target.textContent);
