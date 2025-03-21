@@ -131,7 +131,7 @@
       div.textContent = text;
       div.style.left = left + "px";
       div.style.top = top + "px";
-      // Se asocia el evento para iniciar el arrastre (ya sea desde depósito o grid)
+      // Asociar el evento para iniciar el arrastre (desde depósito o grilla)
       div.addEventListener("mousedown", iniciarArrastre);
       return div;
     }
@@ -164,17 +164,17 @@
 
     // Variables para controlar el arrastre
     let offsetX, offsetY, currentDragged = null, originalParent, originalPos = { left: 0, top: 0 };
+    // Umbral de distancia para aplicar el efecto imán (en píxeles)
+    const snapThreshold = 50;
 
     function iniciarArrastre(event) {
       currentDragged = event.currentTarget;
-      // Guardar el padre original (puede ser el depósito o un slot de la grilla)
       originalParent = currentDragged.parentElement;
-      // Usamos event.offsetX y event.offsetY para tomar el punto exacto donde se hizo clic
-      offsetX = event.offsetX;
-      offsetY = event.offsetY;
-      // Obtener la posición actual del elemento en pantalla
       originalPos.left = currentDragged.getBoundingClientRect().left;
       originalPos.top = currentDragged.getBoundingClientRect().top;
+      // Usamos event.offsetX/Y para obtener el punto exacto de clic
+      offsetX = event.offsetX;
+      offsetY = event.offsetY;
       // Reparentear a document.body para mover libremente por toda la ventana
       currentDragged.style.position = "absolute";
       currentDragged.style.left = originalPos.left + "px";
@@ -187,7 +187,6 @@
 
     function moverElemento(event) {
       if (!currentDragged) return;
-      // Actualizar la posición usando el offset calculado
       const nuevaIzquierda = event.clientX - offsetX;
       const nuevaArriba = event.clientY - offsetY;
       currentDragged.style.left = nuevaIzquierda + "px";
@@ -201,30 +200,41 @@
       currentDragged.style.zIndex = "";
       
       const fraseRect = currentDragged.getBoundingClientRect();
+      const fraseCenter = {
+        x: fraseRect.left + fraseRect.width / 2,
+        y: fraseRect.top + fraseRect.height / 2
+      };
+
       const slots = document.querySelectorAll(".slot");
-      let colocado = false;
-      
-      // Detectar si la frase se solapa con algún slot vacío
+      let snapSlot = null;
+      let minDistance = Infinity;
+
+      // Buscar el slot vacío más cercano al centro de la frase
       slots.forEach(slot => {
-        const slotRect = slot.getBoundingClientRect();
-        if (
-          fraseRect.left < slotRect.right &&
-          fraseRect.right > slotRect.left &&
-          fraseRect.top < slotRect.bottom &&
-          fraseRect.bottom > slotRect.top &&
-          slot.childNodes.length === 0
-        ) {
-          // Reubicar la frase en el slot sin eliminar su listener de arrastre
-          currentDragged.style.position = "static";
-          currentDragged.style.left = "";
-          currentDragged.style.top = "";
-          slot.appendChild(currentDragged);
-          colocado = true;
+        if (slot.childNodes.length === 0) {
+          const slotRect = slot.getBoundingClientRect();
+          const slotCenter = {
+            x: slotRect.left + slotRect.width / 2,
+            y: slotRect.top + slotRect.height / 2
+          };
+          const dx = slotCenter.x - fraseCenter.x;
+          const dy = slotCenter.y - fraseCenter.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < minDistance) {
+            minDistance = distance;
+            snapSlot = slot;
+          }
         }
       });
-      
-      // Si no se soltó en ningún slot, reinsertarla en el depósito
-      if (!colocado) {
+
+      // Si la distancia mínima es menor al umbral, se produce el "snap"
+      if (snapSlot && minDistance <= snapThreshold) {
+        currentDragged.style.position = "static";
+        currentDragged.style.left = "";
+        currentDragged.style.top = "";
+        snapSlot.appendChild(currentDragged);
+      } else {
+        // Si no se acerca lo suficiente a un slot, reinsertarla en el depósito
         const depRect = deposito.getBoundingClientRect();
         const finalLeft = event.clientX - offsetX - depRect.left;
         const finalTop = event.clientY - offsetY - depRect.top;
@@ -248,7 +258,7 @@
       document.getElementById("link").value = url.href;
     }
 
-    // Al cargar la página, si existe el parámetro "orden" en la URL, se ubican las frases en la grilla correspondiente.
+    // Al cargar, si hay parámetro "orden", reubicar las frases en la grilla
     window.onload = function() {
       const params = new URLSearchParams(window.location.search);
       if (params.has("orden")) {
@@ -256,7 +266,6 @@
         const slots = document.querySelectorAll(".slot");
         posiciones.forEach((texto, index) => {
           if (texto && slots[index]) {
-            // Buscar la frase en el depósito para evitar duplicados
             const existente = Array.from(deposito.children).find(el => el.textContent === texto);
             if (existente) {
               existente.style.position = "static";
