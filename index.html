@@ -11,6 +11,8 @@
             align-items: center;
             margin-top: 20px;
         }
+
+        /* Estilo para la grilla de tipo pirámide */
         .deposito {
             display: grid;
             grid-template-columns: repeat(8, 1fr); /* 8 columnas */
@@ -22,6 +24,7 @@
             border: 2px dashed #999;
             margin-top: 20px;
         }
+
         .deposito .phrase {
             padding: 10px;
             background-color: lightblue;
@@ -37,6 +40,8 @@
             justify-content: center;
             word-wrap: break-word;
         }
+
+        /* Estilo para la grilla 8x3 */
         .grid {
             display: flex;
             gap: -5px;
@@ -59,7 +64,8 @@
             background-color: #f9f9f9;
             font-size: 10px;
         }
-        /* Área de trabajo libre */
+
+        /* Estilo para el área de trabajo libre */
         .workspace {
             width: 30cm;
             height: 15cm;
@@ -71,10 +77,12 @@
             justify-content: center;
             align-items: center;
         }
+
         .workspace .phrase {
             position: absolute;
             cursor: grab;
         }
+
         .workspace .phrase.dragging {
             opacity: 0.5;
         }
@@ -83,11 +91,17 @@
 <body>
     <div class="container">
         <h2>Frases a ordenar</h2>
-        <div class="workspace" id="workspace"></div> <!-- Área libre donde se pueden mover las frases -->
-        
-        <h2>Grilla de Ordenación</h2>
-        <div class="grid" id="grid"></div> <!-- Cuadrícula de ordenación -->
-        
+        <!-- Área de trabajo libre en el medio -->
+        <div class="workspace" id="workspace"></div>
+
+        <!-- Grilla de tipo pirámide -->
+        <h2>Grilla tipo pirámide</h2>
+        <div class="deposito" id="deposito"></div>
+
+        <!-- Grilla 8x3 para ordenar las frases -->
+        <h2>Grilla de Ordenación (8x3)</h2>
+        <div class="grid" id="grid"></div>
+
         <button onclick="generarEnlace()">Generar Enlace al finalizar la clasificación de todas las frases, luego copiar y enviar link a zanczuk@iicar-conicet.gob.ar</button>
         <input type="text" id="link" readonly style="width: 80%; margin-top: 10px;">
     </div>
@@ -132,6 +146,7 @@
         const espacios = [2, 3, 4, 4, 6, 4, 4, 3, 2];
         
         const workspace = document.getElementById("workspace");
+        const deposito = document.getElementById("deposito");
         const grid = document.getElementById("grid");
         
         // Crear los elementos de frase para el deposito
@@ -150,7 +165,26 @@
             workspace.appendChild(crearFraseElement(frase));
         });
         
-        // Crear la grilla para ordenación
+        // Crear la grilla de tipo pirámide
+        estructura.forEach((nombre, index) => {
+            const column = document.createElement("div");
+            column.classList.add("column");
+            
+            const label = document.createElement("h3");
+            label.textContent = nombre;
+            column.appendChild(label);
+            
+            for (let i = 0; i < espacios[index]; i++) {
+                const slot = document.createElement("div");
+                slot.classList.add("slot");
+                slot.addEventListener("dragover", dragOver);
+                slot.addEventListener("drop", drop);
+                column.appendChild(slot);
+            }
+            deposito.appendChild(column);
+        });
+
+        // Crear la grilla 8x3 para ordenación
         estructura.forEach((nombre, index) => {
             const column = document.createElement("div");
             column.classList.add("column");
