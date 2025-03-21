@@ -17,29 +17,42 @@
             width: 80%;
             min-height: 150px;
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
             gap: 5px;
+            position: relative;
+             margin-top: -10px;
+        }
+        .deposito .phrase {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 5px; /* Espacio entre las cartas */
+            transition: all 0.2s ease;
+            z-index: 1;
         }
         .grid {
             display: flex;
-            gap: 5px;
-            margin-top: 10px;
+            gap: -5px;
+            margin-top: -1px;
         }
         .column {
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin-top: -30px;
         }
         .slot {
-            width: 150px;
+            width: 130px;
             height: 90px;
             border: 2px solid #ccc;
-            margin: 5px;
+            margin: 1px;
             display: flex;
             align-items: center;
             justify-content: center;
             background-color: #f9f9f9;
-            font-size: 12px;
+            font-size: 10px;
         }
         .phrase {
             padding: 10px;
@@ -48,10 +61,17 @@
             user-select: none;
             border: 1px solid #000;
             text-align: center;
-            width: 140px;
+            width: 150px; /* Ampliamos el ancho a 15cm */
+            height: auto;
+            min-height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
+            word-wrap: break-word;
+              margin-top: -1px;
+        }
+        .slot .phrase {
+            width: 100%; /* Ajuste automático al ancho del slot */
         }
     </style>
 </head>
