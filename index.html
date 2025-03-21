@@ -181,7 +181,6 @@
             event.preventDefault();
             const text = event.dataTransfer.getData("text");
             const draggedElement = document.querySelector(".dragging");
-            
             if (draggedElement) {
                 if (event.target === deposito) {
                     deposito.appendChild(draggedElement);
