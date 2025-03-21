@@ -9,7 +9,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: -10px;
+            margin-top: 20px;
         }
         .deposito {
             display: grid;
@@ -20,8 +20,7 @@
             min-height: 150px;
             padding: 10px;
             border: 2px dashed #999;
-            margin-top: -10px;
-            justify-content: center;
+            margin-top: 20px;
         }
         .deposito .phrase {
             padding: 10px;
@@ -41,7 +40,7 @@
         .grid {
             display: flex;
             gap: -5px;
-            margin-top: -1px;
+            margin-top: 10px;
         }
         .column {
             display: flex;
@@ -60,14 +59,35 @@
             background-color: #f9f9f9;
             font-size: 10px;
         }
+        /* Área de trabajo libre */
+        .workspace {
+            width: 30cm;
+            height: 15cm;
+            border: 2px solid #ccc;
+            position: relative;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .workspace .phrase {
+            position: absolute;
+            cursor: grab;
+        }
+        .workspace .phrase.dragging {
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Frases a ordenar</h2>
-        <div class="deposito" id="deposito"></div> <!-- Cuadrícula 8x4 para las frases -->
+        <div class="workspace" id="workspace"></div> <!-- Área libre donde se pueden mover las frases -->
+        
         <h2>Grilla de Ordenación</h2>
-        <div class="grid" id="grid"></div> <!-- Cuadrícula de ordenación original -->
+        <div class="grid" id="grid"></div> <!-- Cuadrícula de ordenación -->
+        
         <button onclick="generarEnlace()">Generar Enlace al finalizar la clasificación de todas las frases, luego copiar y enviar link a zanczuk@iicar-conicet.gob.ar</button>
         <input type="text" id="link" readonly style="width: 80%; margin-top: 10px;">
     </div>
@@ -111,7 +131,7 @@
         const estructura = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
         const espacios = [2, 3, 4, 4, 6, 4, 4, 3, 2];
         
-        const deposito = document.getElementById("deposito");
+        const workspace = document.getElementById("workspace");
         const grid = document.getElementById("grid");
         
         // Crear los elementos de frase para el deposito
@@ -125,9 +145,9 @@
             return div;
         }
 
-        // Rellenar la cuadrícula de frases
+        // Rellenar el área de trabajo con frases
         frases.forEach(frase => {
-            deposito.appendChild(crearFraseElement(frase));
+            workspace.appendChild(crearFraseElement(frase));
         });
         
         // Crear la grilla para ordenación
@@ -148,7 +168,7 @@
             }
             grid.appendChild(column);
         });
-        
+
         // Drag and drop
         function dragStart(event) {
             event.dataTransfer.setData("text", event.target.textContent);
@@ -195,7 +215,7 @@
                     if (text) {
                         const slot = document.querySelectorAll(".slot")[index];
                         if (slot && text) {
-                            const fraseEnDeposito = Array.from(deposito.children).find(el => el.textContent === text);
+                            const fraseEnDeposito = Array.from(workspace.children).find(el => el.textContent === text);
                             if (fraseEnDeposito) fraseEnDeposito.remove();
                             slot.appendChild(crearFraseElement(text));
                         }
