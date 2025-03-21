@@ -12,16 +12,31 @@
             margin-top: -10px;
         }
         .deposito {
-            border: 2px dashed #999;
-            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr); /* 8 columnas */
+            grid-template-rows: repeat(4, 1fr); /* 4 filas */
+            gap: 10px;
             width: 80%;
             min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            position: relative;
+            padding: 10px;
+            border: 2px dashed #999;
             margin-top: -10px;
+            justify-content: center;
+        }
+        .deposito .phrase {
+            padding: 10px;
+            background-color: lightblue;
+            cursor: grab;
+            user-select: none;
+            border: 1px solid #000;
+            text-align: center;
+            width: 100%; /* Ajusta el tamaño dentro del grid */
+            height: auto;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-wrap: break-word;
         }
         .grid {
             display: flex;
@@ -45,34 +60,14 @@
             background-color: #f9f9f9;
             font-size: 10px;
         }
-        .phrase {
-            padding: 10px;
-            background-color: lightblue;
-            cursor: grab;
-            user-select: none;
-            border: 1px solid #000;
-            text-align: center;
-            width: auto; /* El ancho ahora es automático para ajustarse a la celda */
-            height: auto;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            word-wrap: break-word;
-            margin: 0; /* Eliminamos cualquier margen extra */
-            box-sizing: border-box; /* Aseguramos que el padding no afecte el tamaño */
-        }
-        .slot .phrase {
-            width: 100%; /* Ajuste automático al ancho del slot */
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Frases a ordenar</h2>
-        <div class="deposito" id="deposito"></div>
+        <div class="deposito" id="deposito"></div> <!-- Cuadrícula 8x4 para las frases -->
         <h2>Grilla de Ordenación</h2>
-        <div class="grid" id="grid"></div>
+        <div class="grid" id="grid"></div> <!-- Cuadrícula de ordenación original -->
         <button onclick="generarEnlace()">Generar Enlace al finalizar la clasificación de todas las frases, luego copiar y enviar link a zanczuk@iicar-conicet.gob.ar</button>
         <input type="text" id="link" readonly style="width: 80%; margin-top: 10px;">
     </div>
@@ -113,35 +108,13 @@
             "El gobierno no debe meterse con los productores, qué producir y cómo es decisión del productor."
         ];
 
-        const deposito = document.getElementById("deposito");
-        
-        // Crear la cuadrícula de frases (8 columnas x 4 filas)
-        const numColumnas = 8;
-        const numFilas = 4;
-        const gridFrases = document.createElement("div");
-        gridFrases.style.display = "grid";
-        gridFrases.style.gridTemplateColumns = `repeat(${numColumnas}, 1fr)`; // 8 columnas
-        gridFrases.style.gridTemplateRows = `repeat(${numFilas}, 1fr)`; // 4 filas
-        gridFrases.style.gap = "10px"; // Espacio entre las celdas
-        gridFrases.style.width = "100%"; // Ocupa el 100% del ancho disponible
-        deposito.appendChild(gridFrases);
-
-        // Crear las celdas con las frases
-        frases.forEach(frase => {
-            const cell = document.createElement("div");
-            cell.classList.add("phrase");
-            cell.draggable = true;
-            cell.textContent = frase;
-            cell.addEventListener("dragstart", dragStart);
-            cell.addEventListener("dragend", dragEnd);
-            gridFrases.appendChild(cell);
-        });
- const estructura = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
+        const estructura = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
         const espacios = [2, 3, 4, 4, 6, 4, 4, 3, 2];
         
         const deposito = document.getElementById("deposito");
         const grid = document.getElementById("grid");
         
+        // Crear los elementos de frase para el deposito
         function crearFraseElement(text) {
             const div = document.createElement("div");
             div.classList.add("phrase");
@@ -151,11 +124,13 @@
             div.addEventListener("dragend", dragEnd);
             return div;
         }
-        
+
+        // Rellenar la cuadrícula de frases
         frases.forEach(frase => {
             deposito.appendChild(crearFraseElement(frase));
         });
         
+        // Crear la grilla para ordenación
         estructura.forEach((nombre, index) => {
             const column = document.createElement("div");
             column.classList.add("column");
@@ -174,39 +149,33 @@
             grid.appendChild(column);
         });
         
-        // Funciones para arrastrar las frases
+        // Drag and drop
         function dragStart(event) {
             event.dataTransfer.setData("text", event.target.textContent);
             event.target.classList.add("dragging");
             setTimeout(() => event.target.style.visibility = "hidden", 0);
         }
-
+        
         function dragEnd(event) {
             event.target.classList.remove("dragging");
             event.target.style.visibility = "visible";
         }
-
+        
         function dragOver(event) {
             event.preventDefault();
         }
-
+        
         function drop(event) {
             event.preventDefault();
             const text = event.dataTransfer.getData("text");
             const draggedElement = document.querySelector(".dragging");
             
-            if (event.target.classList.contains("slot")) {
-                if (!event.target.firstChild) {
-                    event.target.appendChild(draggedElement);
-                }
-            } else if (event.target === deposito) {
-                deposito.appendChild(draggedElement);
+            if (event.target.classList.contains("slot") && !event.target.firstChild) {
+                event.target.appendChild(draggedElement);
             }
         }
 
-        deposito.addEventListener("dragover", dragOver);
-        deposito.addEventListener("drop", drop);
-
+        // Generar enlace con el orden
         function generarEnlace() {
             const posiciones = [];
             document.querySelectorAll(".slot").forEach((slot, index) => {
@@ -217,6 +186,7 @@
             document.getElementById("link").value = url.href;
         }
 
+        // Cargar el enlace de la URL
         window.onload = function() {
             const params = new URLSearchParams(window.location.search);
             if (params.has("orden")) {
@@ -232,7 +202,7 @@
                     }
                 });
             }
-        }
+        };
     </script>
 </body>
 </html>
