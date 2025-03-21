@@ -9,10 +9,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 20px;
+            margin-top: -10px;
         }
-
-        /* Estilo para la grilla de tipo pirámide */
         .deposito {
             display: grid;
             grid-template-columns: repeat(8, 1fr); /* 8 columnas */
@@ -22,9 +20,9 @@
             min-height: 150px;
             padding: 10px;
             border: 2px dashed #999;
-            margin-top: 20px;
+            margin-top: -10px;
+            justify-content: center;
         }
-
         .deposito .phrase {
             padding: 10px;
             background-color: lightblue;
@@ -40,12 +38,10 @@
             justify-content: center;
             word-wrap: break-word;
         }
-
-        /* Estilo para la grilla 8x3 */
         .grid {
             display: flex;
             gap: -5px;
-            margin-top: 10px;
+            margin-top: -1px;
         }
         .column {
             display: flex;
@@ -64,44 +60,14 @@
             background-color: #f9f9f9;
             font-size: 10px;
         }
-
-        /* Estilo para el área de trabajo libre */
-        .workspace {
-            width: 30cm;
-            height: 15cm;
-            border: 2px solid #ccc;
-            position: relative;
-            margin-top: 20px;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .workspace .phrase {
-            position: absolute;
-            cursor: grab;
-        }
-
-        .workspace .phrase.dragging {
-            opacity: 0.5;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Frases a ordenar</h2>
-        <!-- Área de trabajo libre en el medio -->
-        <div class="workspace" id="workspace"></div>
-
-        <!-- Grilla de tipo pirámide -->
-        <h2>Grilla tipo pirámide</h2>
-        <div class="deposito" id="deposito"></div>
-
-        <!-- Grilla 8x3 para ordenar las frases -->
-        <h2>Grilla de Ordenación (8x3)</h2>
-        <div class="grid" id="grid"></div>
-
+        <div class="deposito" id="deposito"></div> <!-- Cuadrícula 8x4 para las frases -->
+        <h2>Grilla de Ordenación</h2>
+        <div class="grid" id="grid"></div> <!-- Cuadrícula de ordenación original -->
         <button onclick="generarEnlace()">Generar Enlace al finalizar la clasificación de todas las frases, luego copiar y enviar link a zanczuk@iicar-conicet.gob.ar</button>
         <input type="text" id="link" readonly style="width: 80%; margin-top: 10px;">
     </div>
@@ -145,7 +111,6 @@
         const estructura = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
         const espacios = [2, 3, 4, 4, 6, 4, 4, 3, 2];
         
-        const workspace = document.getElementById("workspace");
         const deposito = document.getElementById("deposito");
         const grid = document.getElementById("grid");
         
@@ -160,31 +125,12 @@
             return div;
         }
 
-        // Rellenar el área de trabajo con frases
+        // Rellenar la cuadrícula de frases
         frases.forEach(frase => {
-            workspace.appendChild(crearFraseElement(frase));
+            deposito.appendChild(crearFraseElement(frase));
         });
         
-        // Crear la grilla de tipo pirámide
-        estructura.forEach((nombre, index) => {
-            const column = document.createElement("div");
-            column.classList.add("column");
-            
-            const label = document.createElement("h3");
-            label.textContent = nombre;
-            column.appendChild(label);
-            
-            for (let i = 0; i < espacios[index]; i++) {
-                const slot = document.createElement("div");
-                slot.classList.add("slot");
-                slot.addEventListener("dragover", dragOver);
-                slot.addEventListener("drop", drop);
-                column.appendChild(slot);
-            }
-            deposito.appendChild(column);
-        });
-
-        // Crear la grilla 8x3 para ordenación
+        // Crear la grilla para ordenación
         estructura.forEach((nombre, index) => {
             const column = document.createElement("div");
             column.classList.add("column");
@@ -202,7 +148,7 @@
             }
             grid.appendChild(column);
         });
-
+        
         // Drag and drop
         function dragStart(event) {
             event.dataTransfer.setData("text", event.target.textContent);
@@ -249,7 +195,7 @@
                     if (text) {
                         const slot = document.querySelectorAll(".slot")[index];
                         if (slot && text) {
-                            const fraseEnDeposito = Array.from(workspace.children).find(el => el.textContent === text);
+                            const fraseEnDeposito = Array.from(deposito.children).find(el => el.textContent === text);
                             if (fraseEnDeposito) fraseEnDeposito.remove();
                             slot.appendChild(crearFraseElement(text));
                         }
