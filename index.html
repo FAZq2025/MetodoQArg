@@ -39,7 +39,7 @@
             align-items: center;
             justify-content: center;
             background-color: #f9f9f9;
-	    font-size: 10px;
+            font-size: 10px;
         }
         .phrase {
             padding: 10px;
@@ -74,38 +74,37 @@
     <script>
         const frases = [
             "La innovación es el resultado de la transferencia de tecnología de expertos a productores",
-"Los productores para innovar necesitan recibir las tecnologías generadas por especialistas y empresas",
-"Para innovar, es necesario debatir y pensar junto con personas que tengan distintas ideas y puntos de vista sobre el asunto",
-"Las mejores soluciones las encontramos discutiendo y trabajando con personas que tengan conocimientos y experiencias valiosas",
-"Innovar es usar tecnología de punta como drones o agricultura de precisión",
-"Hay que estar en la vanguardia de las últimas tecnologías",
-"A los productores les gusta ver y probar cómo funcionan las cosas antes de usarlas",
-"Aprender a partir de la experiencia es fundamental para los productores, no sirven las reuniones que son como clases",
-"Los productores adecuan las tecnologías disponibles para que les resulten útiles a su situación",
-"Los productores son creativos y prueban constantemente nuevas estrategias y formas de trabajar y producir",
-"Los productores no son realmente innovadores, el sector agropecuario es conservador",
-"Los productores en general son bastante reacios a innovar",
-"Los extensionistas o asesores son responsables de transferir tecnologías y de persuadir a los productores para que las adopten",
-"Las tecnologías ya están disponibles, los asesores y extensionistas tienen que enseñarlas a los productores",
-"Para un buen asesor o extensionista, los conocimientos y experiencias de los productores son fundamentales",
-"El rol de los extensionistas o asesores es acompañar el proceso de toma de decisiones de los productores",
-"La labor de asesoramiento o extensión debe partir de lo que le piden sus productores",
-"Los productores son los responsables de traccionar y demandar a asesores o extensionistas para que respondan a sus necesidades",
-"Los investigadores tienen el rol de generar tecnologías y conocimientos para innovar",
-"Los investigadores facilitan el trabajo del productor creando soluciones tecnológicas confiables",
-"Los investigadores hacen aportes descontextualizados, poco útiles para los productores",
-"Los investigadores tienen una mirada poco realista sobre cómo se produce",
-"Pensar siempre en aumentar las ganancias nos está llevando a la destrucción de los ecosistemas",
-"Estoy convencido que la agroecología es el camino",
-"Hay que usar herbicidas porque intentar ahorrar en los controles de malezas puede salir muy caro",
-"En los mejores campos no hay problema con seguir aplicando el modelo de agricultura industrial convencional",
-"Los agroquímicos deben usarse con mucho cuidado: son tóxicos pero también son necesarios para conseguir una buena producción",
-"Tenemos que adoptar modelos que sean altamente productivos pero que a la vez sean amigables con la naturaleza.",
-"La confianza entre productores y sus asesores y/o extensionistas es clave para obtener buenos resultados.",
-"Un buen vínculo entre asesores/extensionistas y productores es más importante que la excelencia técnica.",
-"El gobierno debe apoyar producciones estratégicas para fomentar el desarrollo nacional.",
-"El gobierno no debe meterse con los productores, qué producir y cómo es decisión del productor."
-       
+            "Los productores para innovar necesitan recibir las tecnologías generadas por especialistas y empresas",
+            "Para innovar, es necesario debatir y pensar junto con personas que tengan distintas ideas y puntos de vista sobre el asunto",
+            "Las mejores soluciones las encontramos discutiendo y trabajando con personas que tengan conocimientos y experiencias valiosas",
+            "Innovar es usar tecnología de punta como drones o agricultura de precisión",
+            "Hay que estar en la vanguardia de las últimas tecnologías",
+            "A los productores les gusta ver y probar cómo funcionan las cosas antes de usarlas",
+            "Aprender a partir de la experiencia es fundamental para los productores, no sirven las reuniones que son como clases",
+            "Los productores adecuan las tecnologías disponibles para que les resulten útiles a su situación",
+            "Los productores son creativos y prueban constantemente nuevas estrategias y formas de trabajar y producir",
+            "Los productores no son realmente innovadores, el sector agropecuario es conservador",
+            "Los productores en general son bastante reacios a innovar",
+            "Los extensionistas o asesores son responsables de transferir tecnologías y de persuadir a los productores para que las adopten",
+            "Las tecnologías ya están disponibles, los asesores y extensionistas tienen que enseñarlas a los productores",
+            "Para un buen asesor o extensionista, los conocimientos y experiencias de los productores son fundamentales",
+            "El rol de los extensionistas o asesores es acompañar el proceso de toma de decisiones de los productores",
+            "La labor de asesoramiento o extensión debe partir de lo que le piden sus productores",
+            "Los productores son los responsables de traccionar y demandar a asesores o extensionistas para que respondan a sus necesidades",
+            "Los investigadores tienen el rol de generar tecnologías y conocimientos para innovar",
+            "Los investigadores facilitan el trabajo del productor creando soluciones tecnológicas confiables",
+            "Los investigadores hacen aportes descontextualizados, poco útiles para los productores",
+            "Los investigadores tienen una mirada poco realista sobre cómo se produce",
+            "Pensar siempre en aumentar las ganancias nos está llevando a la destrucción de los ecosistemas",
+            "Estoy convencido que la agroecología es el camino",
+            "Hay que usar herbicidas porque intentar ahorrar en los controles de malezas puede salir muy caro",
+            "En los mejores campos no hay problema con seguir aplicando el modelo de agricultura industrial convencional",
+            "Los agroquímicos deben usarse con mucho cuidado: son tóxicos pero también son necesarios para conseguir una buena producción",
+            "Tenemos que adoptar modelos que sean altamente productivos pero que a la vez sean amigables con la naturaleza.",
+            "La confianza entre productores y sus asesores y/o extensionistas es clave para obtener buenos resultados.",
+            "Un buen vínculo entre asesores/extensionistas y productores es más importante que la excelencia técnica.",
+            "El gobierno debe apoyar producciones estratégicas para fomentar el desarrollo nacional.",
+            "El gobierno no debe meterse con los productores, qué producir y cómo es decisión del productor."
         ];
         
         const estructura = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
@@ -147,12 +146,12 @@
         function dragStart(event) {
             event.dataTransfer.setData("text", event.target.textContent);
             event.target.classList.add("dragging");
-            setTimeout(() => event.target.style.display = "none", 0);
+            setTimeout(() => event.target.style.visibility = "hidden", 0);
         }
         
         function dragEnd(event) {
             event.target.classList.remove("dragging");
-            event.target.style.display = "flex";
+            event.target.style.visibility = ""; // Restablecer la visibilidad
         }
         
         function dragOver(event) {
@@ -165,10 +164,10 @@
             const draggedElement = document.querySelector(".dragging");
             
             if (draggedElement) {
-                if (event.target.classList.contains("slot") && !event.target.firstChild) {
-                    event.target.appendChild(draggedElement);
-                } else if (event.target.classList.contains("deposito")) {
+                if (event.target === deposito) {
                     deposito.appendChild(draggedElement);
+                } else if (event.target.classList.contains("slot") && !event.target.firstChild) {
+                    event.target.appendChild(draggedElement);
                 }
             }
         }
@@ -179,21 +178,21 @@
                 posiciones.push(slot.firstChild ? slot.firstChild.textContent : "");
             });
             const url = new URL(window.location.href);
-            url.searchParams.set("orden", JSON.stringify(posiciones));
+            url.searchParams.set("orden", encodeURIComponent(JSON.stringify(posiciones)));
             document.getElementById("link").value = url.href;
         }
         
         window.onload = function() {
             const params = new URLSearchParams(window.location.search);
             if (params.has("orden")) {
-                const posiciones = JSON.parse(params.get("orden"));
+                const posiciones = JSON.parse(decodeURIComponent(params.get("orden")));
                 posiciones.forEach((text, index) => {
                     if (text) {
                         const slot = document.querySelectorAll(".slot")[index];
-                        if (slot) {
-                            slot.appendChild(crearFraseElement(text));
+                        if (slot && text) {
                             const fraseEnDeposito = Array.from(deposito.children).find(el => el.textContent === text);
                             if (fraseEnDeposito) fraseEnDeposito.remove();
+                            slot.appendChild(crearFraseElement(text));
                         }
                     }
                 });
@@ -202,3 +201,4 @@
     </script>
 </body>
 </html>
+
