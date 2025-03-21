@@ -21,16 +21,7 @@
             align-items: center;
             gap: 5px;
             position: relative;
-             margin-top: -10px;
-        }
-        .deposito .phrase {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            margin-top: 5px; /* Espacio entre las cartas */
-            transition: all 0.2s ease;
-            z-index: 1;
+            margin-top: -10px;
         }
         .grid {
             display: flex;
@@ -61,14 +52,15 @@
             user-select: none;
             border: 1px solid #000;
             text-align: center;
-            width: 150px; /* Ampliamos el ancho a 15cm */
+            width: auto; /* El ancho ahora es automático para ajustarse a la celda */
             height: auto;
             min-height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             word-wrap: break-word;
-              margin-top: -1px;
+            margin: 0; /* Eliminamos cualquier margen extra */
+            box-sizing: border-box; /* Aseguramos que el padding no afecte el tamaño */
         }
         .slot .phrase {
             width: 100%; /* Ajuste automático al ancho del slot */
@@ -84,7 +76,6 @@
         <button onclick="generarEnlace()">Generar Enlace al finalizar la clasificación de todas las frases, luego copiar y enviar link a zanczuk@iicar-conicet.gob.ar</button>
         <input type="text" id="link" readonly style="width: 80%; margin-top: 10px;">
     </div>
-    
     
     <script>
         const frases = [
@@ -121,59 +112,47 @@
             "El gobierno debe apoyar producciones estratégicas para fomentar el desarrollo nacional.",
             "El gobierno no debe meterse con los productores, qué producir y cómo es decisión del productor."
         ];
-        const estructura = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
-        const espacios = [2, 3, 4, 4, 6, 4, 4, 3, 2];
-        
+
         const deposito = document.getElementById("deposito");
-        const grid = document.getElementById("grid");
         
-        function crearFraseElement(text) {
-            const div = document.createElement("div");
-            div.classList.add("phrase");
-            div.draggable = true;
-            div.textContent = text;
-            div.addEventListener("dragstart", dragStart);
-            div.addEventListener("dragend", dragEnd);
-            return div;
-        }
-        
+        // Crear la cuadrícula de frases (8 columnas x 4 filas)
+        const numColumnas = 8;
+        const numFilas = 4;
+        const gridFrases = document.createElement("div");
+        gridFrases.style.display = "grid";
+        gridFrases.style.gridTemplateColumns = `repeat(${numColumnas}, 1fr)`; // 8 columnas
+        gridFrases.style.gridTemplateRows = `repeat(${numFilas}, 1fr)`; // 4 filas
+        gridFrases.style.gap = "10px"; // Espacio entre las celdas
+        gridFrases.style.width = "100%"; // Ocupa el 100% del ancho disponible
+        deposito.appendChild(gridFrases);
+
+        // Crear las celdas con las frases
         frases.forEach(frase => {
-            deposito.appendChild(crearFraseElement(frase));
+            const cell = document.createElement("div");
+            cell.classList.add("phrase");
+            cell.draggable = true;
+            cell.textContent = frase;
+            cell.addEventListener("dragstart", dragStart);
+            cell.addEventListener("dragend", dragEnd);
+            gridFrases.appendChild(cell);
         });
-        
-        estructura.forEach((nombre, index) => {
-            const column = document.createElement("div");
-            column.classList.add("column");
-            
-            const label = document.createElement("h3");
-            label.textContent = nombre;
-            column.appendChild(label);
-            
-            for (let i = 0; i < espacios[index]; i++) {
-                const slot = document.createElement("div");
-                slot.classList.add("slot");
-                slot.addEventListener("dragover", dragOver);
-                slot.addEventListener("drop", drop);
-                column.appendChild(slot);
-            }
-            grid.appendChild(column);
-        });
-        
+
+        // Funciones para arrastrar las frases
         function dragStart(event) {
             event.dataTransfer.setData("text", event.target.textContent);
             event.target.classList.add("dragging");
             setTimeout(() => event.target.style.visibility = "hidden", 0);
         }
-        
+
         function dragEnd(event) {
             event.target.classList.remove("dragging");
             event.target.style.visibility = "visible";
         }
-        
+
         function dragOver(event) {
             event.preventDefault();
         }
-        
+
         function drop(event) {
             event.preventDefault();
             const text = event.dataTransfer.getData("text");
@@ -187,10 +166,11 @@
                 deposito.appendChild(draggedElement);
             }
         }
-        
+
         deposito.addEventListener("dragover", dragOver);
         deposito.addEventListener("drop", drop);
-           function generarEnlace() {
+
+        function generarEnlace() {
             const posiciones = [];
             document.querySelectorAll(".slot").forEach((slot, index) => {
                 posiciones.push(slot.firstChild ? slot.firstChild.textContent : "");
@@ -199,7 +179,7 @@
             url.searchParams.set("orden", encodeURIComponent(JSON.stringify(posiciones)));
             document.getElementById("link").value = url.href;
         }
-        
+
         window.onload = function() {
             const params = new URLSearchParams(window.location.search);
             if (params.has("orden")) {
@@ -219,12 +199,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-      
-        
-       
