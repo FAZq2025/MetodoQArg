@@ -12,18 +12,19 @@
       margin-top: 20px;
       font-family: Arial, sans-serif;
     }
-    /* Depósito: área de posicionamiento libre ampliada */
+    /* Depósito: Área de posicionamiento libre ampliada (600px de alto) */
     .deposito {
-      position: relative; /* Los elementos con position:absolute se ubican respecto a este contenedor */
+      position: relative;
       width: 80%;
-      height: 400px;  /* Área aumentada para mover libremente */
+      height: 600px; /* Aumentado 50% */
       padding: 10px;
       border: 2px dashed #999;
       background-color: #fff;
       margin-bottom: 20px;
-      overflow: auto;
+      /* Se permite visualizar si se arrastra fuera */
+      overflow: visible;
     }
-    /* Caja de frase: se posiciona de forma absoluta dentro del depósito */
+    /* Caja de frase: estilo inicial (se creará con posición absoluta en el depósito) */
     .phrase {
       position: absolute;
       padding: 10px;
@@ -72,7 +73,7 @@
 
     <h2>Grilla de Ordenación</h2>
     <div class="grid" id="grid">
-      <!-- Se generará la grilla según la estructura y cantidad de slots -->
+      <!-- Se genera la grilla a partir de la estructura -->
     </div>
     
     <button onclick="generarEnlace()">Generar Enlace</button>
@@ -80,7 +81,7 @@
   </div>
 
   <script>
-    // Array de 32 frases
+    // Array con las 32 frases
     const frases = [
       "La innovación es el resultado de la transferencia de tecnología de expertos a productores",
       "Los productores para innovar necesitan recibir las tecnologías generadas por especialistas y empresas",
@@ -116,27 +117,26 @@
       "El gobierno no debe meterse con los productores, qué producir y cómo es decisión del productor."
     ];
 
-    // Estructura de la grilla: columnas y cantidad de slots (total 32)
+    // Estructura de la grilla: números y cantidad de slots (total 32)
     const estructura = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
     const espacios = [2, 3, 4, 4, 6, 4, 4, 3, 2];
 
     const deposito = document.getElementById("deposito");
     const grid = document.getElementById("grid");
 
-    // Crear elemento para cada frase con posición absoluta
+    // Función que crea un elemento de frase con posición inicial (en depósito)
     function crearFraseElement(text, left, top) {
       const div = document.createElement("div");
       div.classList.add("phrase");
       div.textContent = text;
-      // Se asigna posición inicial (si no se pasa, se coloca en 0,0)
       div.style.left = left + "px";
       div.style.top = top + "px";
-      // Eventos para arrastre libre
+      // Se asocia el evento para iniciar el arrastre (free drag)
       div.addEventListener("mousedown", iniciarArrastre);
       return div;
     }
 
-    // Distribuir las 32 frases en el depósito (por ejemplo, en un grid interno)
+    // Distribuir las 32 frases en el depósito en un "mini-grid" inicial
     const gapX = 10, gapY = 10, phraseWidth = 130, phraseHeight = 50;
     frases.forEach((frase, index) => {
       const col = index % 8;
@@ -147,7 +147,7 @@
       deposito.appendChild(fraseElem);
     });
 
-    // Generar la grilla de ordenación según la estructura definida
+    // Generar la grilla de ordenación según la estructura
     estructura.forEach((nombre, index) => {
       const column = document.createElement("div");
       column.classList.add("column");
@@ -157,78 +157,85 @@
       for (let i = 0; i < espacios[index]; i++) {
         const slot = document.createElement("div");
         slot.classList.add("slot");
-        // No usamos eventos nativos de drag & drop; la detección se hará en el free drag
         column.appendChild(slot);
       }
       grid.appendChild(column);
     });
 
-    // Variables para el movimiento libre
-    let offsetX, offsetY, currentDragged = null;
+    // Variables para controlar el arrastre
+    let offsetX, offsetY, currentDragged = null, originalParent, originalPos = { left: 0, top: 0 };
 
     function iniciarArrastre(event) {
       currentDragged = event.currentTarget;
-      // Lleva el elemento al frente
+      // Guardar el padre original (deposito) y la posición relativa
+      originalParent = currentDragged.parentElement;
+      originalPos.left = currentDragged.getBoundingClientRect().left;
+      originalPos.top = currentDragged.getBoundingClientRect().top;
+      // Calcular el offset respecto al cursor
+      offsetX = event.clientX - originalPos.left;
+      offsetY = event.clientY - originalPos.top;
+      // Reparentear a document.body para mover libremente por toda la ventana
+      currentDragged.style.position = "absolute";
+      currentDragged.style.left = originalPos.left + "px";
+      currentDragged.style.top = originalPos.top + "px";
+      document.body.appendChild(currentDragged);
       currentDragged.style.zIndex = 1000;
-      offsetX = event.clientX - currentDragged.getBoundingClientRect().left;
-      offsetY = event.clientY - currentDragged.getBoundingClientRect().top;
       document.addEventListener("mousemove", moverElemento);
       document.addEventListener("mouseup", finalizarArrastre);
     }
 
     function moverElemento(event) {
       if (!currentDragged) return;
-      const contenedorRect = deposito.getBoundingClientRect();
-      let nuevaIzquierda = event.clientX - contenedorRect.left - offsetX;
-      let nuevaArriba = event.clientY - contenedorRect.top - offsetY;
-      // Limitar para que no se salga del depósito
-      if (nuevaIzquierda < 0) nuevaIzquierda = 0;
-      if (nuevaArriba < 0) nuevaArriba = 0;
-      if (nuevaIzquierda + currentDragged.offsetWidth > deposito.offsetWidth) {
-        nuevaIzquierda = deposito.offsetWidth - currentDragged.offsetWidth;
-      }
-      if (nuevaArriba + currentDragged.offsetHeight > deposito.offsetHeight) {
-        nuevaArriba = deposito.offsetHeight - currentDragged.offsetHeight;
-      }
+      // Actualizar posición en función del cursor y el offset
+      const nuevaIzquierda = event.clientX - offsetX;
+      const nuevaArriba = event.clientY - offsetY;
       currentDragged.style.left = nuevaIzquierda + "px";
       currentDragged.style.top = nuevaArriba + "px";
     }
 
     function finalizarArrastre(event) {
       if (!currentDragged) return;
-      currentDragged.style.zIndex = "";
       document.removeEventListener("mousemove", moverElemento);
       document.removeEventListener("mouseup", finalizarArrastre);
+      currentDragged.style.zIndex = "";
       
-      // Al soltar, se verifica si la frase se encuentra sobre algún slot de la grilla
       const fraseRect = currentDragged.getBoundingClientRect();
       const slots = document.querySelectorAll(".slot");
-      let dropped = false;
+      let colocado = false;
+      // Detectar si la frase se solapa con algún slot vacío
       slots.forEach(slot => {
         const slotRect = slot.getBoundingClientRect();
-        // Se verifica intersección (colisión simple)
         if (
           fraseRect.left < slotRect.right &&
           fraseRect.right > slotRect.left &&
           fraseRect.top < slotRect.bottom &&
           fraseRect.bottom > slotRect.top &&
-          slot.childNodes.length === 0 // sólo se coloca si el slot está vacío
+          slot.childNodes.length === 0
         ) {
-          // Se transfiere la frase al slot
+          // Si hay colisión, reubicar la frase en el slot y remover el evento de arrastre
           currentDragged.removeEventListener("mousedown", iniciarArrastre);
-          // Quitar estilos de posición para que se acomode dentro del slot
           currentDragged.style.position = "static";
           currentDragged.style.left = "";
           currentDragged.style.top = "";
           slot.appendChild(currentDragged);
-          dropped = true;
+          colocado = true;
         }
       });
-      // Si no se soltó en ningún slot, la frase queda en su posición libre en el depósito.
+      // Si no se soltó en ningún slot, reinsertarla en el depósito.
+      if (!colocado) {
+        // Calcular la posición relativa al depósito
+        const depRect = deposito.getBoundingClientRect();
+        const finalLeft = event.clientX - offsetX - depRect.left;
+        const finalTop = event.clientY - offsetY - depRect.top;
+        currentDragged.style.position = "absolute";
+        currentDragged.style.left = finalLeft + "px";
+        currentDragged.style.top = finalTop + "px";
+        deposito.appendChild(currentDragged);
+      }
       currentDragged = null;
     }
 
-    // Función para generar un enlace que incluya el orden de la grilla
+    // Función para generar el enlace con el orden de la grilla
     function generarEnlace() {
       const slots = document.querySelectorAll(".slot");
       const posiciones = [];
@@ -240,7 +247,7 @@
       document.getElementById("link").value = url.href;
     }
 
-    // Al cargar, si hay un parámetro "orden" en la URL se coloca cada frase en su slot correspondiente.
+    // Al cargar la página, si existe el parámetro "orden" en la URL, se ubican las frases en la grilla correspondiente.
     window.onload = function() {
       const params = new URLSearchParams(window.location.search);
       if (params.has("orden")) {
@@ -248,7 +255,7 @@
         const slots = document.querySelectorAll(".slot");
         posiciones.forEach((texto, index) => {
           if (texto && slots[index]) {
-            // Si la frase ya está en el depósito, se retira para evitar duplicados
+            // Buscar la frase en el depósito para evitar duplicados
             const existente = Array.from(deposito.children).find(el => el.textContent === texto);
             if (existente) {
               existente.removeEventListener("mousedown", iniciarArrastre);
