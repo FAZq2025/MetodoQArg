@@ -129,13 +129,12 @@
         }
         
         frases.forEach(frase => deposito.appendChild(crearFraseElement(frase)));
-function actualizarDeposito() { // NUEVO
+
             document.querySelectorAll(".phrase").forEach((frase, index) => {
                 frase.style.display = index === 0 ? "flex" : "none";
             });
         }
-        actualizarDeposito(); // NUEVO
-
+      
 	    
         estructura.forEach((nombre, index) => {
             const column = document.createElement("div");
@@ -181,7 +180,6 @@ function actualizarDeposito() { // NUEVO
                 } else if (event.target.classList.contains("deposito")) {
                     deposito.appendChild(draggedElement);
                 }
-		    actualizarDeposito(); // NUEVO
             }
         }
         
@@ -210,7 +208,6 @@ function actualizarDeposito() { // NUEVO
                     }
                 });
             }
-		  actualizarDeposito(); // NUEVO
         }
     </script>
 </body>
