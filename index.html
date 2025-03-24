@@ -285,6 +285,30 @@
         });
       }
     };
+    function exportarTxt() {
+  let datos = [];
+  document.querySelectorAll(".phrase").forEach(frase => {
+    let texto = frase.textContent;
+    let left = parseInt(frase.style.left, 10) || 0;
+    let top = parseInt(frase.style.top, 10) || 0;
+    
+    // Verificar si está en la grilla o en el depósito
+    let categoria = "Depósito";
+    let parent = frase.parentElement;
+    if (parent.classList.contains("slot")) {
+      categoria = parent.parentElement.querySelector("h3").textContent;
+    }
+    
+    datos.push(`"${texto}" | Categoría: ${categoria} | Posición: (${left}, ${top})`);
+  });
+
+  // Crear un Blob y exportar
+  let blob = new Blob([datos.join("\n")], { type: "text/plain" });
+  let enlace = document.createElement("a");
+  enlace.href = URL.createObjectURL(blob);
+  enlace.download = "clasificacion_frases.txt";
+  enlace.click();
+}
   </script>
 </body>
 </html>
