@@ -189,8 +189,8 @@
 
     function moverElemento(event) {
       if (!currentDragged) return;
-      const nuevaIzquierda = event.clientX - offsetX;
-      const nuevaArriba = event.clientY - offsetY;
+      const nuevaIzquierda = event.pageX - offsetX;
+      const nuevaArriba = event.pageY - offsetY;
       currentDragged.style.left = nuevaIzquierda + "px";
       currentDragged.style.top = nuevaArriba + "px";
     }
@@ -238,8 +238,8 @@
       } else {
         // Si no se acerca lo suficiente a un slot, reinsertarla en el depósito
         const depRect = deposito.getBoundingClientRect();
-        const finalLeft = event.clientX - offsetX - depRect.left;
-        const finalTop = event.clientY - offsetY - depRect.top;
+        const finalLeft = event.pageX - offsetX - depRect.left;
+        const finalTop = event.pageY - offsetY - depRect.top;
         currentDragged.style.position = "absolute";
         currentDragged.style.left = finalLeft + "px";
         currentDragged.style.top = finalTop + "px";
