@@ -253,16 +253,29 @@
       currentDragged = null;
     }
 
-    // Función para generar el enlace con el orden de la grilla
-    function generarEnlace() {
-      const slots = document.querySelectorAll(".slot");
-      const posiciones = [];
-      slots.forEach(slot => {
-        posiciones.push(slot.firstChild ? slot.firstChild.textContent : "");
-      });
-      const url = new URL(window.location.href);
-      url.searchParams.set("orden", encodeURIComponent(JSON.stringify(posiciones)));
-      document.getElementById("link").value = url.href;
+  function generarEnlace() {
+  const slots = document.querySelectorAll(".slot");
+  const posiciones = [];
+  let frasesCompletas = true;
+
+  slots.forEach(slot => {
+    if (slot.firstChild) {
+      posiciones.push(slot.firstChild.textContent);
+    } else {
+      frasesCompletas = false;
+    }
+  });
+
+  if (!frasesCompletas) {
+    alert("Por favor, clasificá las 32 frases en la grilla antes de generar el enlace.");
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("orden", encodeURIComponent(JSON.stringify(posiciones)));
+  document.getElementById("link").value = url.href;
+}
+
     }
 
     // Al cargar, si hay parámetro "orden", reubicar las frases en la grilla
