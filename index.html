@@ -86,6 +86,7 @@
     
     <button onclick="generarEnlace()">Generar Enlace: (Sólo si están todas las frases clasificadas en la grilla)</button>
     <input type="text" id="link" readonly style="width: 80%; margin-top: 5px;">
+    <button id="copiarBtn" onclick="copiarEnlace()" style="display: none; margin-top: 5px;">Copiar enlace</button>
   </div>
 
   <script>
@@ -253,18 +254,45 @@
       currentDragged = null;
     }
 
-    // Función para generar el enlace con el orden de la grilla
-    function generarEnlace() {
-      const slots = document.querySelectorAll(".slot");
-      const posiciones = [];
-      slots.forEach(slot => {
-        posiciones.push(slot.firstChild ? slot.firstChild.textContent : "");
-      });
-      const url = new URL(window.location.href);
-      url.searchParams.set("orden", encodeURIComponent(JSON.stringify(posiciones)));
-      document.getElementById("link").value = url.href;
-    }
+  function generarEnlace() {
+  const slots = document.querySelectorAll(".slot");
+  const posiciones = [];
+  let frasesCompletas = true;
 
+  slots.forEach(slot => {
+    if (slot.firstChild) {
+      posiciones.push(slot.firstChild.textContent);
+    } else {
+      frasesCompletas = false;
+    }
+  });
+
+  if (!frasesCompletas) {
+    alert("Por favor, clasificá las 32 frases en la grilla antes de generar el enlace.");
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("orden", encodeURIComponent(JSON.stringify(posiciones)));
+  document.getElementById("link").value = url.href;
+
+  // Mostrar botón de copiar
+  document.getElementById("copiarBtn").style.display = "inline-block";
+}
+function copiarEnlace() {
+  const input = document.getElementById("link");
+  input.select();
+  input.setSelectionRange(0, 99999); // Para dispositivos móviles
+  document.execCommand("copy");
+
+  // Cambiar texto del botón como confirmación
+  const btn = document.getElementById("copiarBtn");
+  const originalText = btn.textContent;
+  btn.textContent = "¡Copiado!";
+  setTimeout(() => {
+    btn.textContent = originalText;
+  }, 1500);
+}
     // Al cargar, si hay parámetro "orden", reubicar las frases en la grilla
     window.onload = function() {
       const params = new URLSearchParams(window.location.search);
