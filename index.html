@@ -202,57 +202,57 @@
     }
 
     function finalizarArrastre(event) {
-      if (!currentDragged) return;
-      document.removeEventListener("mousemove", moverElemento);
-      document.removeEventListener("mouseup", finalizarArrastre);
-      currentDragged.style.zIndex = "";
-      
-      const fraseRect = currentDragged.getBoundingClientRect();
-      const fraseCenter = {
-        x: fraseRect.left + fraseRect.width / 2,
-        y: fraseRect.top + fraseRect.height / 2
+  if (!currentDragged) return;
+  document.removeEventListener("mousemove", moverElemento);
+  document.removeEventListener("mouseup", finalizarArrastre);
+  currentDragged.style.zIndex = "";
+  
+  const fraseRect = currentDragged.getBoundingClientRect();
+  const fraseCenter = {
+    x: fraseRect.left + fraseRect.width / 2,
+    y: fraseRect.top + fraseRect.height / 2
+  };
+
+  const slots = document.querySelectorAll(".slot");
+  let snapSlot = null;
+  let minDistance = Infinity;
+
+  // Buscar el slot vacío más cercano al centro de la frase
+  slots.forEach(slot => {
+    if (slot.childNodes.length === 0) {
+      const slotRect = slot.getBoundingClientRect();
+      const slotCenter = {
+        x: slotRect.left + slotRect.width / 2,
+        y: slotRect.top + slotRect.height / 2
       };
-
-      const slots = document.querySelectorAll(".slot");
-      let snapSlot = null;
-      let minDistance = Infinity;
-
-      // Buscar el slot vacío más cercano al centro de la frase
-      slots.forEach(slot => {
-        if (slot.childNodes.length === 0) {
-          const slotRect = slot.getBoundingClientRect();
-          const slotCenter = {
-            x: slotRect.left + slotRect.width / 2,
-            y: slotRect.top + slotRect.height / 2
-          };
-          const dx = slotCenter.x - fraseCenter.x;
-          const dy = slotCenter.y - fraseCenter.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance < minDistance) {
-            minDistance = distance;
-            snapSlot = slot;
-          }
-        }
-      });
-
-      // Si la distancia mínima es menor al umbral, se produce el "snap"
-      if (snapSlot && minDistance <= snapThreshold) {
-        currentDragged.style.position = "static";
-        currentDragged.style.left = "";
-        currentDragged.style.top = "";
-        snapSlot.appendChild(currentDragged);
-      } else {
-        // Si no se acerca lo suficiente a un slot, reinsertarla en el depósito
-        const depRect = deposito.getBoundingClientRect();
-        const finalLeft = event.pageX - offsetX - depRect.left;
-        const finalTop = event.pageY - offsetY - depRect.top;
-        currentDragged.style.position = "absolute";
-        currentDragged.style.left = finalLeft + "px";
-        currentDragged.style.top = finalTop + "px";
-        deposito.appendChild(currentDragged);
+      const dx = slotCenter.x - fraseCenter.x;
+      const dy = slotCenter.y - fraseCenter.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < minDistance) {
+        minDistance = distance;
+        snapSlot = slot;
       }
-      currentDragged = null;
     }
+  });
+
+  // Si la distancia mínima es menor al umbral, se produce el "snap"
+  if (snapSlot && minDistance <= snapThreshold) {
+    currentDragged.style.position = "static";
+    currentDragged.style.left = "";
+    currentDragged.style.top = "";
+    snapSlot.appendChild(currentDragged);
+  } else {
+    // Si no se acerca lo suficiente a un slot, reinsertarla en el depósito
+    const depRect = deposito.getBoundingClientRect();
+    const finalLeft = event.pageX - offsetX - depRect.left;
+    const finalTop = event.pageY - offsetY - depRect.top;
+    currentDragged.style.position = "absolute";
+    currentDragged.style.left = finalLeft + "px";
+    currentDragged.style.top = finalTop + "px";
+    deposito.appendChild(currentDragged);
+  }
+  currentDragged = null;
+}
 
   function generarEnlace() {
   const slots = document.querySelectorAll(".slot");
